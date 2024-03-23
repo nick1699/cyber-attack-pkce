@@ -1,0 +1,58 @@
+version: '3'
+services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0.1
+    ports:
+      - "8080:8080"
+    command:
+      - start-dev
+    environment:
+      DB_VENDOR: POSTGRES
+      DB_HOST: postgres-keycloak
+      DB_NAME: keycloak
+      DB_USER: keycloak
+      DB_PASSWORD: password
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    depends_on:
+      - postgres-keycloak
+    networks:
+      - app-network
+  keycloak-config-cli:
+    image: adorsys/keycloak-config-cli
+    volumes:
+      - ./config/keycloak/dev:/config
+    environment:
+      KEYCLOAK_VERSION: 24.0.1
+      KEYCLOAK_URL: http://keycloak:8080
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: admin
+      KEYCLOAK_AVAILABILITYCHECK_ENABLED: true
+      KEYCLOAK_AVAILABILITYCHECK_TIMEOUT: 120s
+      IMPORT_FILES: /config/keycloak/dev
+    depends_on:
+      - keycloak
+    networks:
+      - app-network
+  postgres-keycloak:
+    image: postgres:16.2
+    restart: always
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: password
+    volumes:
+      - ./postgres-keycloak-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.name: app-network
+    ipam:
+      config:
+        - subnet: 172.22.1.0/24
