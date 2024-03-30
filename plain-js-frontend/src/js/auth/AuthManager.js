@@ -7,7 +7,10 @@ export class AuthManager {
 
     async handleAuthentication() {
         const existingToken = sessionStorage.getItem("access_token");
-        if (existingToken && this.isTokenValid(existingToken)) return;
+        if (existingToken && this.isTokenValid(existingToken)) {
+            this.setupAutomaticTokenRefresh();
+            return;
+        }
 
         const code = new URLSearchParams(window.location.search).get("code");
         if (code) {
@@ -46,6 +49,49 @@ export class AuthManager {
         }
     }
 
+    async refreshToken(minValidity = 5) {
+        const token = sessionStorage.getItem("access_token");
+        if (token) {
+            const payload = this.decodeJWT(token);
+            const now = Date.now() / 1000;
+            const timeLeft = payload.exp - now;
+
+            if (timeLeft >= minValidity * 60) {
+                return false;
+            }
+        }
+
+        const refreshToken = sessionStorage.getItem("refresh_token");
+        if (!refreshToken) {
+            return false;
+        }
+
+        const url = constructUrl(`${this.config.baseUrl}/realms/${this.config.realm}/protocol/openid-connect/token`);
+        const body = new URLSearchParams({
+            client_id: this.config.clientId,
+            grant_type: "refresh_token",
+            refresh_token: refreshToken
+        });
+
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                body
+            });
+
+            if (!response.ok) {
+                throw new Error(`Failed to refresh token: ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            ["access_token", "id_token", "refresh_token", "session_state"].forEach(key => sessionStorage.setItem(key, data[key]));
+            return true;
+        } catch (error) {
+            return false;
+        }
+    }
+
     buildAuthUrl({state, nonce}) {
         return constructUrl(`${this.config.baseUrl}/realms/${this.config.realm}/protocol/openid-connect/auth`, {
             client_id: this.config.clientId,
@@ -69,6 +115,11 @@ export class AuthManager {
         return Array.from(array).map(b => b.toString(36).padStart(2, '0')).join('');
     }
 
+    isLoggedIn() {
+        const token = sessionStorage.getItem("access_token");
+        return !!token && this.isTokenValid(token);
+    }
+
     isTokenValid = (token) => {
         if (!token) return false;
         const payload = this.decodeJWT(token);
@@ -90,5 +141,21 @@ export class AuthManager {
         const state = this.generateRandomState();
         const nonce = this.generateRandomState();
         window.location.href = this.buildAuthUrl({state, nonce}).toString();
+    }
+
+    setupAutomaticTokenRefresh() {
+        setInterval(async () => {
+            if (this.isLoggedIn()) {
+                this.refreshToken().then(refreshed => {
+                    if (refreshed) {
+                        console.log('Token wurde erfolgreich erneuert');
+                    } else {
+                        console.log('Token ist noch gültig. Keine Erneuerung notwendig.');
+                    }
+                }).catch(error => {
+                    console.error('Fehler beim Erneuern des Tokens', error);
+                });
+            }
+        }, 5000);
     }
 }
