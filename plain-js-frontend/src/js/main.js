@@ -1,4 +1,4 @@
-import {AuthManager} from './auth/auth.js';
+import {AuthManager} from './auth/AuthManager.js';
 import {displayUserProfile} from "./ui/ui.js";
 import {config} from './config/config.js';
 
