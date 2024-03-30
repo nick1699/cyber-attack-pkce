@@ -63,10 +63,11 @@ export class AuthManager {
         return JSON.parse(window.atob(parts[1]));
     };
 
-    generateRandomState = () => 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
-        const r = Math.random() * 16 | 0;
-        return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
-    });
+    generateRandomState(length = 32) {
+        let array = new Uint8Array(length);
+        window.crypto.getRandomValues(array);
+        return Array.from(array).map(b => b.toString(36).padStart(2, '0')).join('');
+    }
 
     isTokenValid = (token) => {
         if (!token) return false;
