@@ -1,4 +1,4 @@
-import { isTokenValid, generateRandomState, decodeJWT, constructUrl } from '../utils.js';
+import {constructUrl, decodeJWT, generateRandomState, isTokenValid} from '../utils.js';
 
 export class AuthManager {
     constructor(config) {
@@ -22,10 +22,10 @@ export class AuthManager {
     redirectToKeycloak() {
         const state = generateRandomState();
         const nonce = generateRandomState();
-        window.location.href = this.buildAuthUrl({ state, nonce }).toString();
+        window.location.href = this.buildAuthUrl({state, nonce}).toString();
     }
 
-    buildAuthUrl({ state, nonce }) {
+    buildAuthUrl({state, nonce}) {
         return constructUrl(`${this.config.baseUrl}/realms/${this.config.realm}/protocol/openid-connect/auth`, {
             client_id: this.config.clientId,
             redirect_uri: this.config.redirectUri,
@@ -47,7 +47,7 @@ export class AuthManager {
         try {
             const response = await fetch(url, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
                 body
             });
             const data = await response.json();
@@ -55,6 +55,12 @@ export class AuthManager {
         } catch (error) {
             console.error("Failed to get token:", error);
         }
+    }
+
+    async getAccessTokenClaims() {
+        const token = sessionStorage.getItem("access_token");
+        if (!token || !isTokenValid(token)) return null;
+        return decodeJWT(token); // Diese Methode gibt das decodierte Payload zurück
     }
 
     logout() {
@@ -66,25 +72,4 @@ export class AuthManager {
         sessionStorage.clear();
         window.location.href = url.toString();
     }
-    
 }
-
-export const displayUserProfile = () => {
-    const token = sessionStorage.getItem("access_token");
-    if (!token) return;
-    const payload = decodeJWT(token);
-    const rootElement = document.querySelector("#root");
-    const profileElement = createUserProfileElement(payload, () => authManager.logout());
-    rootElement.appendChild(profileElement);
-};
-
-const createUserProfileElement = (payload, onLogout) => {
-    const div = document.createElement("div");
-    const userName = document.createElement("label");
-    userName.innerText = `--------${payload.given_name} ${payload.family_name} (${payload.email})--------`;
-    const logoutButton = document.createElement("button");
-    logoutButton.innerText = "Logout";
-    logoutButton.addEventListener("click", onLogout);
-    div.append(userName, logoutButton);
-    return div;
-};
