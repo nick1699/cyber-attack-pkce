@@ -1,7 +1,6 @@
-import { isTokenValid, generateRandomState, decodeJWT } from './utils.js';
-import { config } from './config.js';
+import { isTokenValid, generateRandomState, decodeJWT, constructUrl } from '../utils.js';
 
-class AuthManager {
+export class AuthManager {
     constructor(config) {
         this.config = config;
     }
@@ -27,7 +26,7 @@ class AuthManager {
     }
 
     buildAuthUrl({ state, nonce }) {
-        return this.constructUrl(`${this.config.baseUrl}/realms/${this.config.realm}/protocol/openid-connect/auth`, {
+        return constructUrl(`${this.config.baseUrl}/realms/${this.config.realm}/protocol/openid-connect/auth`, {
             client_id: this.config.clientId,
             redirect_uri: this.config.redirectUri,
             response_type: "code",
@@ -38,7 +37,7 @@ class AuthManager {
     }
 
     async getToken(code) {
-        const url = this.constructUrl(`${this.config.baseUrl}/realms/${this.config.realm}/protocol/openid-connect/token`);
+        const url = constructUrl(`${this.config.baseUrl}/realms/${this.config.realm}/protocol/openid-connect/token`);
         const body = new URLSearchParams({
             client_id: this.config.clientId,
             redirect_uri: this.config.redirectUri,
@@ -59,7 +58,7 @@ class AuthManager {
     }
 
     logout() {
-        const url = this.constructUrl(`${this.config.baseUrl}/realms/${this.config.realm}/protocol/openid-connect/logout`, {
+        const url = constructUrl(`${this.config.baseUrl}/realms/${this.config.realm}/protocol/openid-connect/logout`, {
             client_id: this.config.clientId,
             post_logout_redirect_uri: this.config.redirectUri,
             id_token_hint: sessionStorage.getItem("id_token")
@@ -67,17 +66,10 @@ class AuthManager {
         sessionStorage.clear();
         window.location.href = url.toString();
     }
-
-    constructUrl(baseUrl, params = {}) {
-        const url = new URL(baseUrl);
-        Object.entries(params).forEach(([key, value]) => url.searchParams.append(key, value));
-        return url;
-    }
+    
 }
 
-const authManager = new AuthManager(config);
-
-const displayUserProfile = () => {
+export const displayUserProfile = () => {
     const token = sessionStorage.getItem("access_token");
     if (!token) return;
     const payload = decodeJWT(token);
@@ -96,8 +88,3 @@ const createUserProfileElement = (payload, onLogout) => {
     div.append(userName, logoutButton);
     return div;
 };
-
-window.addEventListener("load", () => {
-    authManager.handleAuthentication();
-    displayUserProfile();
-});

@@ -15,3 +15,9 @@ export const isTokenValid = (token) => {
     const now = Date.now() / 1000;
     return payload.exp > now;
 };
+
+export const constructUrl = (baseUrl, params = {}) => {
+    const url = new URL(baseUrl);
+    Object.entries(params).forEach(([key, value]) => url.searchParams.append(key, value));
+    return url;
+}
