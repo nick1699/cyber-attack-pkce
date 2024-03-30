@@ -1,80 +1,88 @@
-import {isTokenValid, generateRandomState, decodeJWT} from './utils.js';
-import {config} from './config.js';
+import { isTokenValid, generateRandomState, decodeJWT } from './utils.js';
+import { config } from './config.js';
 
-const handleAuthentication = async () => {
-    const existingToken = sessionStorage.getItem("access_token");
-    if (existingToken && isTokenValid(existingToken)) {
-        return;
+class AuthManager {
+    constructor(config) {
+        this.config = config;
     }
 
-    const params = new URLSearchParams(window.location.search);
-    const code = params.get("code");
-    if (code) {
-        await getToken(code);
-        window.history.replaceState({}, '', '/');
-        window.location.reload();
-        return;
+    async handleAuthentication() {
+        const existingToken = sessionStorage.getItem("access_token");
+        if (existingToken && isTokenValid(existingToken)) return;
+
+        const code = new URLSearchParams(window.location.search).get("code");
+        if (code) {
+            await this.getToken(code);
+            window.history.replaceState({}, '', '/');
+            window.location.reload();
+        } else {
+            this.redirectToKeycloak();
+        }
     }
-    redirectToKeycloak();
-};
 
-const redirectToKeycloak = () => {
-    const state = generateRandomState();
-    const nonce = generateRandomState();
-    const connectionURI = buildAuthUrl(config, {state, nonce});
-    window.location.href = connectionURI.toString();
-};
+    redirectToKeycloak() {
+        const state = generateRandomState();
+        const nonce = generateRandomState();
+        window.location.href = this.buildAuthUrl({ state, nonce }).toString();
+    }
 
-const buildAuthUrl = ({baseUrl, realm, clientId, redirectUri}, {state, nonce}) => {
-    const url = new URL(`${baseUrl}/realms/${realm}/protocol/openid-connect/auth`);
-    const params = {
-        client_id: clientId,
-        redirect_uri: redirectUri,
-        response_type: "code",
-        scope: "openid",
-        nonce,
-        state
-    };
-    Object.entries(params).forEach(([key, value]) => url.searchParams.append(key, value));
-    return url;
-};
+    buildAuthUrl({ state, nonce }) {
+        return this.constructUrl(`${this.config.baseUrl}/realms/${this.config.realm}/protocol/openid-connect/auth`, {
+            client_id: this.config.clientId,
+            redirect_uri: this.config.redirectUri,
+            response_type: "code",
+            scope: "openid",
+            nonce,
+            state
+        });
+    }
 
-const getToken = async code => {
-    const url = new URL(`${config.baseUrl}/realms/${config.realm}/protocol/openid-connect/token`);
-    const body = new URLSearchParams({
-        client_id: config.clientId,
-        redirect_uri: config.redirectUri,
-        grant_type: "authorization_code",
-        code
-    });
-    const response = await fetch(url, {
-        method: 'post',
-        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-        body
-    });
-    const data = await response.json();
-    ["access_token", "id_token", "refresh_token", "session_state"].forEach(key => sessionStorage.setItem(key, data[key]));
-};
+    async getToken(code) {
+        const url = this.constructUrl(`${this.config.baseUrl}/realms/${this.config.realm}/protocol/openid-connect/token`);
+        const body = new URLSearchParams({
+            client_id: this.config.clientId,
+            redirect_uri: this.config.redirectUri,
+            grant_type: "authorization_code",
+            code
+        });
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body
+            });
+            const data = await response.json();
+            ["access_token", "id_token", "refresh_token", "session_state"].forEach(key => sessionStorage.setItem(key, data[key]));
+        } catch (error) {
+            console.error("Failed to get token:", error);
+        }
+    }
 
-const logout = () => {
-    const url = new URL(`${config.baseUrl}/realms/${config.realm}/protocol/openid-connect/logout`);
-    const idTokenHint = sessionStorage.getItem("id_token");
-    const params = {
-        client_id: config.clientId,
-        post_logout_redirect_uri: config.redirectUri,
-        id_token_hint: idTokenHint
-    };
-    Object.entries(params).forEach(([key, value]) => url.searchParams.append(key, value));
-    sessionStorage.clear();
-    window.location.href = url.toString();
-};
+    logout() {
+        const url = this.constructUrl(`${this.config.baseUrl}/realms/${this.config.realm}/protocol/openid-connect/logout`, {
+            client_id: this.config.clientId,
+            post_logout_redirect_uri: this.config.redirectUri,
+            id_token_hint: sessionStorage.getItem("id_token")
+        });
+        sessionStorage.clear();
+        window.location.href = url.toString();
+    }
+
+    constructUrl(baseUrl, params = {}) {
+        const url = new URL(baseUrl);
+        Object.entries(params).forEach(([key, value]) => url.searchParams.append(key, value));
+        return url;
+    }
+}
+
+const authManager = new AuthManager(config);
 
 const displayUserProfile = () => {
     const token = sessionStorage.getItem("access_token");
     if (!token) return;
     const payload = decodeJWT(token);
     const rootElement = document.querySelector("#root");
-    const profileElement = createUserProfileElement(payload, logout);
+    const profileElement = createUserProfileElement(payload, () => authManager.logout());
     rootElement.appendChild(profileElement);
 };
 
@@ -90,6 +98,6 @@ const createUserProfileElement = (payload, onLogout) => {
 };
 
 window.addEventListener("load", () => {
-    handleAuthentication();
+    authManager.handleAuthentication();
     displayUserProfile();
 });
