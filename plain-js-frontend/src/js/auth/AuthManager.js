@@ -56,7 +56,7 @@ export class AuthManager {
             const now = Date.now() / 1000;
             const timeLeft = payload.exp - now;
 
-            if (timeLeft >= minValidity * 60) {
+            if (timeLeft >= minValidity) {
                 return false;
             }
         }
@@ -156,6 +156,6 @@ export class AuthManager {
                     console.error('Fehler beim Erneuern des Tokens', error);
                 });
             }
-        }, 5000);
+        }, 1000);
     }
 }
