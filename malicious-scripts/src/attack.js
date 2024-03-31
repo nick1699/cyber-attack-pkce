@@ -1,0 +1,1 @@
+alert("Du wurdest gehackt");

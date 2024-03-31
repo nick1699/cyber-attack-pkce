@@ -7,7 +7,7 @@ function displaySearchQuery() {
     const searchQuery = queryParams.get('search');
     if (searchQuery) {
         // Fix für XSS mit .textContent
-        document.getElementById('searchQuery').textContent = searchQuery;
+        document.getElementById('searchQuery').innerHTML = searchQuery;
     }
 }
 
