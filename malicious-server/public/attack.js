@@ -1,10 +1,11 @@
 (function() {
     const originalFetch = window.fetch;
 
-    // Alle HTTP-Request abfangen und überschreiben
+    // Alle HTTP-Request abfangen
     window.fetch = function(...args) {
-        // Man in the middle für Token Endpoint
-        if (args[0].href.includes('/realms/cyber-attack/protocol/openid-connect/token')) {
+        const requestURI = args[0].href;
+        // Man in the middle bei Token-Endpoint
+        if (requestURI.includes('/realms/cyber-attack/protocol/openid-connect/token')) {
             return originalFetch.apply(this, args).then(response => {
                 const clonedResponse = response.clone();
 
