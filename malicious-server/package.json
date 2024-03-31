@@ -2,9 +2,9 @@
   "name": "prepared-frontend",
   "version": "1.0.0",
   "scripts": {
-    "start": "http-server src -p 9999"
+    "start": "node src/server.js"
   },
   "dependencies": {
-    "http-server": "^14.1.1"
+    "express": "^4.19.2"
   }
 }

@@ -1,1 +1,0 @@
-alert("Du wurdest gehackt");
