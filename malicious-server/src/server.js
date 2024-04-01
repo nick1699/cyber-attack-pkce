@@ -9,19 +9,23 @@ app.use(bodyParser.json());
 app.use(bodyParser.text());
 app.use(express.static('public'));
 
+function logWithTimestamp(sessionId, ...messages) {
+    const timestamp = new Date().toLocaleTimeString();
+    console.log(`${timestamp} [${sessionId}] -`, ...messages);
+}
+
 app.post('/rest/receive-token-body', (req, res) => {
     const { sessionId, body } = req.body;
     tokenRequestsPerSession[sessionId] = body;
 
-    console.log(`Empfangener Token-Body von Sitzung ${sessionId}:`, body);
+    logWithTimestamp(sessionId, 'Empfangener Token-Body');
     res.status(200).send();
 });
 
 app.post('/rest/tab-closed', (req, res) => {
     const sessionId = req.body;
-    console.log(`Tab oder Browser mit Sitzung ${sessionId} wurde geschlossen.`);
-    console.log(`Token können nun vom Server erneuert werden: ${tokenRequestsPerSession[sessionId].refresh_token}`);
-    res.status(200).send('Tab-Schließung registriert');
+    logWithTimestamp(sessionId, 'Tab oder Browser wurde geschlossen.');
+    logWithTimestamp(sessionId, `Refresh Token: ${tokenRequestsPerSession[sessionId].refresh_token}`);
 });
 
 app.listen(port, () => {
