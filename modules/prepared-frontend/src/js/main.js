@@ -1,15 +1,6 @@
 import {AuthManager} from './auth/AuthManager.js';
-import {displayUserProfile} from "./ui/ui.js";
+import {displayUserProfile, displaySearchQuery} from "./ui/ui.js";
 import {config} from './config/config.js';
-
-function displaySearchQuery() {
-    const queryParams = new URLSearchParams(window.location.search);
-    const searchQuery = queryParams.get('search');
-    if (searchQuery) {
-        // Fix für XSS mit .textContent
-        document.getElementById('searchQuery').innerHTML = searchQuery;
-    }
-}
 
 window.addEventListener("load", () => {
     const authManager = new AuthManager(config);
