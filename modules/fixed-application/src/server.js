@@ -1,5 +1,7 @@
 const { auth } = require('express-openid-connect');
 const express = require('express');
+const ejs = require('ejs');
+const path = require('path');
 
 const config = {
     authRequired: false,
@@ -10,17 +12,22 @@ const config = {
     secret: 'e2UyOmghQvuSmXDq4EMXMcezzCZRVQ',
     authorizationParams: {
         response_type: 'code'
-    }
+    },
+    idpLogout: true
 };
 const app = express();
 
 const port = 3000;
 
-// Auth-Router fügt doe Rputen /login, /logout und /callback zur Base-URL hinzu
+// Setze die Template-Engine auf EJS
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+
+// Auth-Router fügt die Routen /login, /logout und /callback zur Base-URL hinzu
 app.use(auth(config));
 
 app.get('/', (req, res) => {
-    res.send(req.oidc.isAuthenticated() ? 'Logged in' : 'Logged out')
+    res.render('index', { isAuthenticated: req.oidc.isAuthenticated(), givenName: req.oidc.user ? req.oidc.user.given_name : null });
 });
 
 app.listen(port, () => {

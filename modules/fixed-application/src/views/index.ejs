@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prepared Frontend</title>
+</head>
+<body>
+    <h1>Welcome <span id="givenName"><%= givenName ? givenName : 'Guest' %></span></h1>
+
+    <% if (isAuthenticated) { %>
+        <a id="logoutButton" href="/logout">Logout</a>
+    <% } else { %>
+        <a id="loginButton" href="/login">Login</a>
+    <% } %>
+
+    <p><b>Suchergebnis: <span id="searchQuery">Ihr Suchtext hier</span></b></p>
+</body>
+</html>
