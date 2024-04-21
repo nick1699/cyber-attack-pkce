@@ -12,10 +12,25 @@ export class AuthManager {
             return;
         }
 
-        const code = new URLSearchParams(window.location.search).get("code");
+        const searchParams = new URLSearchParams(window.location.search);
+        const code = searchParams.get("code");
         if (code) {
+            searchParams.delete("state");
+            searchParams.delete("session_state");
+            searchParams.delete("iss");
+            searchParams.delete("code");
+
+            let newUrl = window.location.pathname;
+            if (searchParams.toString()) {
+                newUrl += `?${searchParams.toString()}`;
+            }
+
+            debugger
+
+            window.history.replaceState({}, '', newUrl);
+
             await this.getToken(code);
-            window.history.replaceState({}, '', '/');
+
             window.location.reload();
         } else {
             this.redirectToKeycloak();
@@ -25,7 +40,7 @@ export class AuthManager {
     async getAccessTokenClaims() {
         const token = sessionStorage.getItem("access_token");
         if (!token || !this.isTokenValid(token)) return null;
-        return this.decodeJWT(token); // Diese Methode gibt das decodierte Payload zurück
+        return this.decodeJWT(token);
     }
 
     async getToken(code) {

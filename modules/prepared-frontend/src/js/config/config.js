@@ -3,6 +3,6 @@ export const config = {
     realm: "cyber-attack",
     clientId: "prepared-frontend",
     get redirectUri() {
-        return `${window.location.protocol}//${window.location.host}/`;
+        return window.location.href;
     },
 };
