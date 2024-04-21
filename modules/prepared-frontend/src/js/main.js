@@ -1,5 +1,5 @@
 import {AuthManager} from './auth/AuthManager.js';
-import {displayUserProfile, displaySearchQuery} from "./ui/ui.js";
+import {displayUserProfile, displayCityQuery} from "./ui/ui.js";
 import {config} from './config/config.js';
 
 window.addEventListener("load", () => {
@@ -11,5 +11,5 @@ window.addEventListener("load", () => {
         console.error("Fehler beim Anzeigen des Benutzerprofils:", error);
     });
 
-    displaySearchQuery();
+    displayCityQuery();
 });
