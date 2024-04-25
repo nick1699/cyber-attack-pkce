@@ -47,8 +47,8 @@ async function fetchBankAccounts(sessionId, accessToken) {
             }
         })
             .then(response => response.json())
-            .then(data => logWithSessionId(sessionId, 'Daten von der API:' + data))
-            .catch(err => logWithSessionId(sessionId, 'Fehler beim API-Aufruf:' + err));
+            .then(data => logWithSessionId(sessionId, 'Daten von der API: ', data))
+            .catch(err => logWithSessionId(sessionId, 'Fehler beim API-Aufruf: ', err));
     } else {
         console.error('Kein Token erhalten');
     }
@@ -66,11 +66,13 @@ app.post('/rest/tab-closed', (req, res) => {
     const sessionId = req.body;
     logWithSessionId(sessionId, 'Tab oder Browser wurde geschlossen.');
 
-    const refreshToken = tokenRequestsPerSession[sessionId].refresh_token;
-    logWithSessionId(sessionId, `Refresh Token: ${refreshToken}`);
-    fetchNewToken(sessionId, refreshToken).then(token => {
-        fetchBankAccounts(sessionId, token);
-    });
+    if (tokenRequestsPerSession[sessionId]) {
+        const refreshToken = tokenRequestsPerSession[sessionId].refresh_token;
+        logWithSessionId(sessionId, `Refresh Token: ${refreshToken}`);
+        fetchNewToken(sessionId, refreshToken).then(token => {
+            fetchBankAccounts(sessionId, token);
+        });
+    }
 });
 
 app.listen(port, () => {

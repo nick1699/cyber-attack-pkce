@@ -93,7 +93,6 @@ export const requiresAuth = () => {
             return res.status(401).send('Invalid token');
         }
 
-        req.auth = authData;
         next();
     };
 };
