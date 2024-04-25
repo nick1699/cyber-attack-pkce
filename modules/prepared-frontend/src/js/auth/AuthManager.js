@@ -5,13 +5,13 @@ export class AuthManager {
         this.config = config;
     }
 
-    async handleAuthentication() {
-        const existingToken = sessionStorage.getItem("access_token");
-        if (existingToken && this.isTokenValid(existingToken)) {
-            this.setupAutomaticTokenRefresh();
-            return;
-        }
+    hasAuthenticationCode() {
+        const searchParams = new URLSearchParams(window.location.search);
+        const code = searchParams.get("code");
+        return !!code;
+    }
 
+    async handleAuthentication() {
         const searchParams = new URLSearchParams(window.location.search);
         const code = searchParams.get("code");
         if (code) {
@@ -24,8 +24,6 @@ export class AuthManager {
             if (searchParams.toString()) {
                 newUrl += `?${searchParams.toString()}`;
             }
-
-            debugger
 
             window.history.replaceState({}, '', newUrl);
 

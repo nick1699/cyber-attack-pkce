@@ -18,7 +18,7 @@ export const displayCityQuery = ()=> {
 
 const createWelcomeMessage = (givenName) => {
     const welcomeSpan = document.querySelector("#givenName");
-    welcomeSpan.innerHTML = givenName;
+    welcomeSpan.innerHTML = `, ${givenName}`;
 }
 
 const addLogoutEvent = (onLogout) => {
