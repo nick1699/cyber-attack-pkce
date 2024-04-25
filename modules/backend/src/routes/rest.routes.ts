@@ -1,10 +1,10 @@
 import {Router} from 'express';
 import {requiresAuth} from "../auth/auth";
-import {InformationController} from "../controllers/information.controller";
+import {AccountsController} from "../controllers/accountsController";
 
 const router: Router = Router();
-const informationController: InformationController = new InformationController();
+const accountsController: AccountsController = new AccountsController();
 
-router.get('/api/information', requiresAuth(), informationController.getInformation);
+router.get('/api/accounts', requiresAuth(), accountsController.getAccounts);
 
 export default router;

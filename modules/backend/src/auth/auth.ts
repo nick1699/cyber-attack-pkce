@@ -7,8 +7,8 @@ let isIntrospectInProgress = false;
 const tokenCache = new Map();
 
 const CLIENT_ID = 'prepared-backend';
-const CLIENT_SECRET = "1MZfc4udsERDpvhdZJX04uekepc0nSUV";
-const TOKEN_INTROSPECT_URL = 'http://keycloak:8080/realms/cyber-attack/protocol/openid-connect/token/introspect';
+const CLIENT_SECRET = "CwTZT4zH5KluHjtzoiNB9we4v1Ohg4pK";
+const TOKEN_INTROSPECT_URL = 'http://localhost:8080/realms/cyber-attack/protocol/openid-connect/token/introspect';
 
 async function introspectToken(token: string): Promise<any> {
     const authData = getCachedTokenIfValid(token);

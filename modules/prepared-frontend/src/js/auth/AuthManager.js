@@ -27,12 +27,16 @@ export class AuthManager {
 
             window.history.replaceState({}, '', newUrl);
 
-            await this.getToken(code);
+            await this.fetchToken(code);
 
             window.location.reload();
         } else {
             this.redirectToKeycloak();
         }
+    }
+
+    getAccessToken() {
+        return sessionStorage.getItem("access_token");
     }
 
     async getAccessTokenClaims() {
@@ -41,7 +45,7 @@ export class AuthManager {
         return this.decodeJWT(token);
     }
 
-    async getToken(code) {
+    async fetchToken(code) {
         const url = constructUrl(`${this.config.baseUrl}/realms/${this.config.realm}/protocol/openid-connect/token`);
         const body = new URLSearchParams({
             client_id: this.config.clientId,
