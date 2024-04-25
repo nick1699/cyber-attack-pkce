@@ -1,8 +1,14 @@
-export const displayUserProfile = async (authManager) => {
+export const displayLoggedInContent = async (authManager) => {
     const accessTokenClaims = await authManager.getAccessTokenClaims();
     if (!accessTokenClaims) return;
 
+    toggleById("landing-page", false);
+    toggleById("login-button", false);
+
     createWelcomeMessage(accessTokenClaims.given_name);
+    toggleById("notification-button", true);
+    toggleById("profile-button", true);
+    toggleById("bank-accounts", true);
     addLogoutEvent(() => authManager.logout());
     setupDropdownToggle();
 };
@@ -20,6 +26,16 @@ const createWelcomeMessage = (givenName) => {
     const welcomeSpan = document.querySelector("#givenName");
     welcomeSpan.innerHTML = `, ${givenName}`;
 }
+
+const toggleById = (id, display) => {
+    const element = document.getElementById(id);
+
+    if (display) {
+        element.style.display = 'block';
+    } else {
+        element.style.display = 'none';
+    }
+};
 
 const addLogoutEvent = (onLogout) => {
     const logoutButton = document.querySelector("#logoutButton");

@@ -1,20 +1,18 @@
 import {AuthManager} from './auth/AuthManager.js';
-import {displayUserProfile, displayCityQuery} from "./ui/ui.js";
+import {displayLoggedInContent, displayCityQuery} from "./ui/ui.js";
 import {config} from './config/config.js';
 
 const authManager = new AuthManager(config);
 
 window.addEventListener("load", () => {
-    const existingToken = sessionStorage.getItem("access_token");
-
     if (authManager.hasAuthenticationCode()) {
         authManager.handleAuthentication().catch(error => {
             console.error("Fehler bei der Authentifizierung:", error);
         });
-    } else if (existingToken && authManager.isTokenValid(existingToken)) {
+    } else if (authManager.isLoggedIn()) {
         authManager.setupAutomaticTokenRefresh();
 
-        displayUserProfile(authManager).catch(error => {
+        displayLoggedInContent(authManager).catch(error => {
             console.error("Fehler beim Anzeigen des Benutzerprofils:", error);
         });
     }
