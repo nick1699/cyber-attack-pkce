@@ -294,8 +294,8 @@
       "clientId": "fixed-application",
       "name": "Fixed Application",
       "description": "",
-      "rootUrl": "http://localhost:3000",
-      "adminUrl": "http://localhost:3000",
+      "rootUrl": "http://localhost:4201",
+      "adminUrl": "http://localhost:4201",
       "baseUrl": "",
       "surrogateAuthRequired": false,
       "enabled": true,
@@ -303,10 +303,10 @@
       "clientAuthenticatorType": "client-secret",
       "secret": "**********",
       "redirectUris": [
-        "http://localhost:3000/callback"
+        "http://localhost:4201/callback"
       ],
       "webOrigins": [
-        "http://localhost:3000"
+        "http://localhost:4201"
       ],
       "notBefore": 0,
       "bearerOnly": false,
@@ -322,7 +322,7 @@
         "oidc.ciba.grant.enabled": "false",
         "client.secret.creation.time": "1712137493",
         "backchannel.logout.session.required": "true",
-        "post.logout.redirect.uris": "http://localhost:3000",
+        "post.logout.redirect.uris": "http://localhost:4201",
         "oauth2.device.authorization.grant.enabled": "false",
         "display.on.consent.screen": "false",
         "backchannel.logout.revoke.offline.tokens": "false"
