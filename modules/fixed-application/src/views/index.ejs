@@ -18,7 +18,8 @@
                     </div>
                     <div class="hidden md:block">
                         <div class="ml-10 flex items-baseline space-x-4">
-                            <a class="bg-gray-900 text-white rounded-md px-3 py-2 text-sm font-medium" aria-current="page">Dashboard</a>
+                            <a class="bg-gray-900 text-white rounded-md px-3 py-2 text-sm font-medium"
+                               aria-current="page">Dashboard</a>
                             <a class="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium">Finanzplaner</a>
                             <a class="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium">Bankkarte</a>
                             <a class="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium">Kredite</a>
@@ -28,7 +29,8 @@
                 <div class="md:block">
                     <div class="ml-4 flex items-center md:ml-6">
                         <% if (!isAuthenticated) { %>
-                            <a href="/login" id="login-button" class="rounded-md bg-indigo-600 px-3.5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+                            <a href="/login" id="login-button"
+                               class="rounded-md bg-indigo-600 px-3.5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
                                 Anmelden
                             </a>
                         <% } else { %>
@@ -58,7 +60,8 @@
                                      tabindex="-1">
                                     <a class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1"
                                        id="user-menu-item-1">Einstellungen</a>
-                                    <a href="/logout" id="logoutButton" class="block px-4 py-2 text-sm text-gray-700 cursor-pointer"
+                                    <a href="/logout" id="logoutButton"
+                                       class="block px-4 py-2 text-sm text-gray-700 cursor-pointer"
                                        role="menuitem" tabindex="-1">Abmelden</a>
                                 </div>
                             </div>
@@ -71,36 +74,56 @@
 
     <header class="bg-gray-100 shadow">
         <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-            <h1 class="text-3xl font-bold tracking-tight text-gray-900">Willkommen bei der Geldbank in <%= city %><span id="givenName"><%= givenName ?`, ${givenName}` : '' %></span>!</h1>
+            <h1 class="text-3xl font-bold tracking-tight text-gray-900">Willkommen bei der Geldbank in <%= city %><span
+                        id="givenName"><%= givenName ? `, ${givenName}` : '' %></span>!</h1>
         </div>
     </header>
 
     <main>
+        <% if (!isAuthenticated) { %>
         <div id="landing-page" class="relative isolate px-6 lg:px-8">
             <div class="mx-auto max-w-2xl lg:py-40">
                 <div class="text-center">
-                    <h1 class="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">Sicherheit und Wachstum für Ihre Finanzen</h1>
-                    <p class="mt-6 text-lg leading-8 text-gray-600">Entdecken Sie, wie unsere maßgeschneiderten Finanzlösungen Ihnen dabei helfen können, Ihre finanziellen Ziele zu erreichen. Wir bieten Ihnen eine Vielfalt an Dienstleistungen – von persönlichen Girokonten bis hin zu komplexen Anlagestrategien.</p>
+                    <h1 class="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">Sicherheit und Wachstum für
+                        Ihre Finanzen</h1>
+                    <p class="mt-6 text-lg leading-8 text-gray-600">Entdecken Sie, wie unsere maßgeschneiderten
+                        Finanzlösungen Ihnen dabei helfen können, Ihre finanziellen Ziele zu erreichen. Wir bieten Ihnen
+                        eine Vielfalt an Dienstleistungen – von persönlichen Girokonten bis hin zu komplexen
+                        Anlagestrategien.</p>
                     <div class="mt-10 flex items-center justify-center gap-x-6">
-                        <a class="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Jetzt Kunde werden</a>
+                        <a class="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Jetzt
+                            Kunde werden</a>
                         <a class="text-sm font-semibold leading-6 text-gray-900">Mehr erfahren <span aria-hidden="true">→</span></a>
                     </div>
                 </div>
             </div>
         </div>
-
-        <div id="bank-accounts" class="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8 hidden">
+        <% } else if (isAuthenticated && accounts) { %>
+        <div id="bank-accounts" class="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
             <div class="w-full p-4 bg-white border border-gray-200 rounded-lg shadow sm:p-8 dark:bg-gray-800 dark:border-gray-700">
                 <div class="flex items-center justify-between mb-4">
                     <h5 class="text-xl font-bold leading-none text-gray-900 dark:text-white">Konten</h5>
                 </div>
                 <div class="flow-root">
                     <ul role="list" class="divide-y divide-gray-200 dark:divide-gray-700">
+                        <% accounts.forEach(function(account) { %>
+                        <li class="py-3">
+                            <div class="flex items-center">
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm font-bold text-gray-900 truncate dark:text-white"><%= account.type %></p>
+                                    <p class="text-sm text-gray-500 truncate dark:text-gray-400"><%= account.iban %></p>
+                                </div>
+                                <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
+                                    <%= account.balance %> €
+                                </div>
+                            </div>
+                        </li>
+                        <% }); %>
                     </ul>
                 </div>
             </div>
-
         </div>
+        <% } %>
     </main>
 
     <footer class="fixed bottom-0 left-0 z-20 w-full p-4 bg-gray-100 border-t border-gray-200 shadow md:flex md:items-center md:justify-between md:p-6 dark:bg-gray-800 dark:border-gray-600">

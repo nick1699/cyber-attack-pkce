@@ -18,12 +18,6 @@ const config = {
         // Default Login Route abschalten, um eigene Parameter mitzugeben
         login: false
     }
-    // afterCallback: (req, res, session, decodedState) => {
-    //     console.log(req);
-    //     console.log(res);
-    //     console.log(session);
-    //     console.log(decodedState);
-    // }
 };
 const app = express();
 
@@ -42,10 +36,34 @@ app.get('/login', (req, res) =>
     })
 );
 
-app.get('/', (req, res) => {
+app.get('/', async (req, res) => {
+    if (req.oidc.isAuthenticated()) {
+        const accessToken = req.oidc.accessToken;
+        const response = await fetch('http://localhost:3000/api/accounts', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${accessToken.access_token}`
+            }
+        });
+        if (response.ok) {
+            const data = await response.json();
+            res.render('index', {
+                city: req.query.city,
+                isAuthenticated: req.oidc.isAuthenticated(),
+                accounts: data,
+                givenName: req.oidc.user ? req.oidc.user.given_name : null
+            });
+            return;
+        } else {
+            throw new Error('Failed to fetch accounts: ' + response.status.toString());
+        }
+    }
+
     res.render('index', {
         city: req.query.city,
         isAuthenticated: req.oidc.isAuthenticated(),
+        accounts: null,
         givenName: req.oidc.user ? req.oidc.user.given_name : null
     });
 });
