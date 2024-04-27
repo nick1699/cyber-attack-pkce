@@ -38,12 +38,16 @@ app.get('/login', (req, res) =>
 
 app.get('/', async (req, res) => {
     if (req.oidc.isAuthenticated()) {
-        const accessToken = req.oidc.accessToken;
+        let { token_type, access_token, isExpired, refresh } = req.oidc.accessToken;
+        if (isExpired()) {
+            ({ access_token } = await refresh());
+        }
+
         const response = await fetch('http://localhost:3000/api/accounts', {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${accessToken.access_token}`
+                'Authorization': `Bearer ${access_token}`
             }
         });
         if (response.ok) {
