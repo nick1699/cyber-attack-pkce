@@ -55,7 +55,7 @@
                                     </button>
                                 </div>
 
-                                <div class="menu absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+                                <div class="menu absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none hidden"
                                      role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button"
                                      tabindex="-1">
                                     <a class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1"
@@ -145,6 +145,13 @@
     </footer>
 </div>
 
-<script type="module" src="js/main.js"></script>
+<script>
+    document.getElementById('user-menu-button').addEventListener('click', function () {
+        const menu = document.querySelector('.menu');
+        const isExpanded = this.getAttribute('aria-expanded') === 'true';
+        this.setAttribute('aria-expanded', !isExpanded);
+        menu.classList.toggle('hidden');
+    });
+</script>
 </body>
 </html>
