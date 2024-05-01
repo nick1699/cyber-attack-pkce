@@ -2,7 +2,7 @@
   "name": "malicious-server",
   "version": "1.0.0",
   "scripts": {
-    "start": "node src/server.js"
+    "start malicious-server": "node src/server.js"
   },
   "dependencies": {
     "express": "^4.19.2"
